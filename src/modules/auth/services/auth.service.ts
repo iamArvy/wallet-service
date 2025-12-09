@@ -9,7 +9,7 @@ import { IGoogleConfig } from 'src/config';
 import { randomInt } from 'crypto';
 
 @Injectable()
-export class GoogleAuthService {
+export class AuthService {
   private googleOauthURL = 'https://accounts.google.com/o/oauth2/v2/auth';
 
   private clientId: string;

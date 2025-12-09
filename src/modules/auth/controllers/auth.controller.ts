@@ -6,7 +6,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { GoogleAuthService } from '../services';
+import { AuthService } from '../services';
 import type { IGoogleUser, IRequestWithUser } from 'src/common/types';
 import { GoogleAuthGuard } from '../guards';
 import {
@@ -18,9 +18,9 @@ import {
 import { AuthResponse, GoogleRedirectDto } from '../dto';
 
 @ApiTags('Auth')
-@Controller('auth/google')
-export class GoogleAuthController {
-  constructor(private readonly service: GoogleAuthService) {}
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly service: AuthService) {}
 
   @ApiOperation({ summary: 'Redirect to Google' })
   @ApiOkResponse({
@@ -28,7 +28,7 @@ export class GoogleAuthController {
     type: GoogleRedirectDto,
   })
   @HttpCode(HttpStatus.OK)
-  @Get()
+  @Get('google')
   redirectToGoogle() {
     return this.service.redirectToGoogle();
   }
@@ -39,7 +39,7 @@ export class GoogleAuthController {
     type: AuthResponse,
   })
   @ApiBadRequestResponse({ description: 'Bad Request - Invalid Token' })
-  @Get('callback')
+  @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   handleGoogleCallback(@Req() req: IRequestWithUser<IGoogleUser>) {
     return this.service.handleGoogleCallback(req.user);

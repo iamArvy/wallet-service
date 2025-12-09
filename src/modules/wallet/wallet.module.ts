@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { PaystackHttpClient } from 'src/integrations/paystack';
 import { WalletService } from './services';
 import { WalletController } from './controllers';
 import { AuthModule } from '../auth/auth.module';
+import { PaystackModule } from 'src/integrations/paystack/paystack.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, PaystackModule],
   controllers: [WalletController],
-  providers: [WalletService, PaystackHttpClient],
+  providers: [WalletService],
 })
 export class WalletModule {}

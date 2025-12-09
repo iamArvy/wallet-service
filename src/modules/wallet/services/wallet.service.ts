@@ -3,14 +3,19 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { IJwtUser } from 'src/common/types';
-import { PaystackHttpClient } from 'src/integrations/paystack';
+import {
+  IPaystackWebhookInterface,
+  PaystackHttpClient,
+} from 'src/integrations/paystack';
 import { TransactionStatus, TransactionType } from 'src/generated/prisma/enums';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { DepositResponseDto, TransactionStatusDto } from '../dto';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class WalletService {
@@ -23,38 +28,6 @@ export class WalletService {
   ) {
     this.logger = baseLogger.child({ context: WalletService.name });
   }
-
-  // async create(userId: string) {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { id: userId },
-  //   });
-  //   if (!user) {
-  //     this.logger.error('User not found');
-  //     return;
-  //   }
-  //   while (true) {
-  //     const wallet_number = this.generateWalletNumber();
-
-  //     try {
-  //       return await this.prisma.wallet.create({
-  //         data: {
-  //           user_id: userId,
-  //           wallet_number,
-  //         },
-  //       });
-  //     } catch (err) {
-  //       if (err instanceof Prisma.PrismaClientKnownRequestError) {
-  //         if (err.code === 'P2002') {
-  //           // retry generating wallet number
-  //           continue;
-  //         }
-  //       }
-
-  //       // Unhandled errors -> rethrow
-  //       throw err;
-  //     }
-  //   }
-  // }
 
   async deposit(rUser: IJwtUser, amount: number, idempotency_key: string) {
     const user = await this.prisma.user.findUnique({
@@ -80,7 +53,7 @@ export class WalletService {
     const wallet = user.wallet;
 
     const response = await this.paystackClient.initializePayment(
-      wallet.id,
+      rUser.email,
       amount,
     );
 
@@ -127,19 +100,63 @@ export class WalletService {
     return new TransactionStatusDto(transaction);
   }
 
-  webhookHandler(signature: string, body: any) {
-    console.log(signature, body);
-    /*
-        Purpose: Receive transaction updates from Paystack.
-        Security: Validate Paystack signature header (e.g. x-paystack-signature) using configured webhook secret.
-        Steps:
-          Verify signature.
-          Parse event payload; find transaction reference.
-          Update transaction status in DB (success, failed, pending, etc.).
-        Response: 200
-          {"status": true}
-        Errors: 400 invalid signature, 500 server error
-      */
+  async processPaystackWebhook(
+    signature: string,
+    payload: IPaystackWebhookInterface,
+  ) {
+    const valid = this.paystackClient.validateWebhookEvent(signature, payload);
+    if (!valid) throw new UnauthorizedException('Invalid Request');
+
+    if (payload.event !== 'charge.success') {
+      this.logger.warn(`Unhandled webhook event: ${payload.event}`);
+      return;
+    }
+
+    const { reference, status } = payload.data;
+
+    const transaction = await this.prisma.transaction.findUnique({
+      where: { reference },
+      include: { wallet: true },
+    });
+
+    if (!transaction) {
+      this.logger.error(`Transaction not found for reference: ${reference}`);
+      return;
+    }
+
+    if (transaction.status === TransactionStatus.success) {
+      this.logger.warn(
+        `Duplicate webhook received — transaction already processed: ${reference}`,
+      );
+      return;
+    }
+
+    if (status !== 'success') {
+      this.logger.warn(`Status is not success for reference ${reference}`);
+      return;
+    }
+
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: TransactionStatus.success,
+          paid_at: new Date(payload.data.paid_at ?? new Date()),
+          webhook_payload: JSON.parse(
+            JSON.stringify(payload),
+          ) as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      await prisma.wallet.update({
+        where: { id: transaction.wallet_id },
+        data: {
+          balance: transaction.wallet.balance + transaction.amount,
+        },
+      });
+    });
+
+    this.logger.info(`Transaction processed successfully: ${reference}`);
   }
 
   private mapPaystackStatus = (status: string): TransactionStatus => {

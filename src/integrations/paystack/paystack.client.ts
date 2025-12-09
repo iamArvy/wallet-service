@@ -13,12 +13,15 @@ import {
   IVerifyPaymentResponse,
   IInitializePaymentResponse,
 } from './interfaces';
+import { createHmac, timingSafeEqual } from 'crypto';
+import { IPaystackWebhookInterface } from './interfaces/webhook.interface';
 
 @Injectable()
 export class PaystackHttpClient {
   protected axiosClient: AxiosInstance;
   private readonly logger: Logger;
   private baseUrl = 'https://api.paystack.co';
+  private secret: string;
 
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) baseLogger: Logger,
@@ -26,6 +29,7 @@ export class PaystackHttpClient {
   ) {
     this.logger = baseLogger.child({ context: PaystackHttpClient.name });
     const { secret } = config.getOrThrow<IPaystackConfig>('payment.paystack');
+    this.secret = secret;
 
     this.axiosClient = axios.create({
       baseURL: this.baseUrl,
@@ -92,5 +96,14 @@ export class PaystackHttpClient {
     return response.data;
   }
 
-  async confirmWebhookSecret() {}
+  validateWebhookEvent(signature: string, payload: IPaystackWebhookInterface) {
+    const hash = createHmac('sha512', this.secret)
+      .update(JSON.stringify(payload))
+      .digest('hex');
+    return (
+      hash &&
+      signature &&
+      timingSafeEqual(Buffer.from(hash), Buffer.from(signature))
+    );
+  }
 }

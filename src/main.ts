@@ -25,6 +25,7 @@ function createSwaggerConfig(
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   const config = app.get(ConfigService);
   const { name, description, version, isDev, env, port, url, prefix } =
     config.getOrThrow<IAppConfig>('app');

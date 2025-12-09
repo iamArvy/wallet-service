@@ -8,7 +8,6 @@ const mockJwtService = () => ({
 
 describe('TokenService', () => {
   let service: TokenService;
-  // let jwtService: ReturnType<typeof mockJwtService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,17 +18,9 @@ describe('TokenService', () => {
     }).compile();
 
     service = module.get<TokenService>(TokenService);
-    // jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
-  // describe('generate', () => {
-  //   it('should call jwtService', async () => {
-  //     jwtService.signAsync.mockRejectedValue('token');
-  //     await expect(jwtService.signAsync).toHaveBeenCalled();
-  //   });
-  // });
 });

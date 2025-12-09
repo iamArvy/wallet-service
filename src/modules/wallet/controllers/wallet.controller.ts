@@ -34,6 +34,7 @@ import {
   ApiKeyPermissions,
   ApiKeyPermissionsGuard,
 } from 'src/modules/auth/guards/api-key-permission.guard';
+import type { IPaystackWebhookInterface } from 'src/integrations/paystack/interfaces/webhook.interface';
 
 @Controller('wallet')
 export class WalletController {
@@ -54,19 +55,6 @@ export class WalletController {
     @Body() { amount }: DepositRequestDto,
     @Headers('Idempotency-key') key: string,
   ) {
-    /*
-    POST /wallet/deposit
-    Auth:
-    JWT
-    API Key with deposit permission.
-    {
-      "amount": 5000
-    }
-    {
-      "reference": "...",
-      "authorization_url": "https://paystack.co/checkout/..."
-    }
-    */
     return this.service.deposit(req.user, amount, key);
   }
 
@@ -82,30 +70,13 @@ export class WalletController {
     return this.service.getTransactions();
   }
 
-  // @Post('paystack/webhook')
-  // paystackWebhookHandler(
-  /**
-   * @param id
-   * @param refresh
-   * @returns
-   */
-  // Purpose:
-  // Receive transaction updates from Paystack.
-  // Credit wallet only after webhook confirms success.
-  // Security:
-  // Validate Paystack signature.
-  // Actions:
-  // Verify signature.
-  // Find transaction by reference.
-  // Update:
-  // transaction status
-  // wallet balance
-  // { "status": true }
-  //   @Headers('x-paystack-signature') signature: string,
-  //   @Body() body: any,
-  // ) {
-  //   return this.service.webhookHandler(signature, body);
-  // }
+  @Post('paystack/webhook')
+  paystackWebhookHandler(
+    @Headers('x-paystack-signature') signature: string,
+    @Body() payload: IPaystackWebhookInterface,
+  ) {
+    return this.service.processPaystackWebhook(signature, payload);
+  }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check the status of a payment' })
