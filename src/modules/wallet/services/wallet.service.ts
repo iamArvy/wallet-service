@@ -14,8 +14,14 @@ import {
 import { TransactionStatus, TransactionType } from 'src/generated/prisma/enums';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { DepositResponseDto, TransactionStatusDto } from '../dto';
+import {
+  DepositResponseDto,
+  TransactionResponseDto,
+  TransactionStatusDto,
+  WalletBalanceDto,
+} from '../dto';
 import { Prisma } from 'src/generated/prisma/client';
+import { ListTransactionsDto } from '../dto/list-transactions.dto';
 
 @Injectable()
 export class WalletService {
@@ -72,17 +78,21 @@ export class WalletService {
   }
 
   async getBalance(userId: string) {
-    console.log(userId);
     const wallet = await this.prisma.wallet.findUnique({
       where: { user_id: userId },
       select: { balance: true },
     });
-    console.log(wallet);
-    return wallet;
+    if (!wallet) throw new NotFoundException('Wallet not foud');
+    return new WalletBalanceDto(wallet);
   }
 
-  getTransactions() {
-    return this.prisma.transaction.findMany();
+  async getTransactions() {
+    const transactions = await this.prisma.transaction.findMany();
+    const transactionDtos = transactions.map(
+      (tx) => new TransactionResponseDto(tx),
+    );
+
+    return new ListTransactionsDto({ items: transactionDtos });
   }
 
   async statusCheck(reference: string, refresh: boolean) {

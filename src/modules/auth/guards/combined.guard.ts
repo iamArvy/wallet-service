@@ -18,7 +18,6 @@ export class CombinedAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest<Request>();
-    console.log(request);
     const authHeader = request.headers['authorization'];
     const apiKeyHeader = request.headers['x-api-key'];
 

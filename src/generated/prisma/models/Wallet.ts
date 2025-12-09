@@ -31,14 +31,14 @@ export type WalletAvgAggregateOutputType = {
 }
 
 export type WalletSumAggregateOutputType = {
-  balance: number | null
+  balance: bigint | null
 }
 
 export type WalletMinAggregateOutputType = {
   id: string | null
   wallet_number: string | null
   user_id: string | null
-  balance: number | null
+  balance: bigint | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -47,7 +47,7 @@ export type WalletMaxAggregateOutputType = {
   id: string | null
   wallet_number: string | null
   user_id: string | null
-  balance: number | null
+  balance: bigint | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -189,7 +189,7 @@ export type WalletGroupByOutputType = {
   id: string
   wallet_number: string
   user_id: string
-  balance: number
+  balance: bigint
   created_at: Date
   updated_at: Date
   _count: WalletCountAggregateOutputType | null
@@ -221,7 +221,7 @@ export type WalletWhereInput = {
   id?: Prisma.StringFilter<"Wallet"> | string
   wallet_number?: Prisma.StringFilter<"Wallet"> | string
   user_id?: Prisma.StringFilter<"Wallet"> | string
-  balance?: Prisma.IntFilter<"Wallet"> | number
+  balance?: Prisma.BigIntFilter<"Wallet"> | bigint | number
   created_at?: Prisma.DateTimeFilter<"Wallet"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Wallet"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -248,7 +248,7 @@ export type WalletWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.WalletWhereInput | Prisma.WalletWhereInput[]
   OR?: Prisma.WalletWhereInput[]
   NOT?: Prisma.WalletWhereInput | Prisma.WalletWhereInput[]
-  balance?: Prisma.IntFilter<"Wallet"> | number
+  balance?: Prisma.BigIntFilter<"Wallet"> | bigint | number
   created_at?: Prisma.DateTimeFilter<"Wallet"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Wallet"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -277,7 +277,7 @@ export type WalletScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Wallet"> | string
   wallet_number?: Prisma.StringWithAggregatesFilter<"Wallet"> | string
   user_id?: Prisma.StringWithAggregatesFilter<"Wallet"> | string
-  balance?: Prisma.IntWithAggregatesFilter<"Wallet"> | number
+  balance?: Prisma.BigIntWithAggregatesFilter<"Wallet"> | bigint | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Wallet"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Wallet"> | Date | string
 }
@@ -285,7 +285,7 @@ export type WalletScalarWhereWithAggregatesInput = {
 export type WalletCreateInput = {
   id?: string
   wallet_number: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   user: Prisma.UserCreateNestedOneWithoutWalletInput
@@ -297,7 +297,7 @@ export type WalletUncheckedCreateInput = {
   id?: string
   wallet_number: string
   user_id: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   sent_transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutWalletInput
@@ -307,7 +307,7 @@ export type WalletUncheckedCreateInput = {
 export type WalletUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutWalletNestedInput
@@ -319,7 +319,7 @@ export type WalletUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sent_transactions?: Prisma.TransactionUncheckedUpdateManyWithoutWalletNestedInput
@@ -330,7 +330,7 @@ export type WalletCreateManyInput = {
   id?: string
   wallet_number: string
   user_id: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -338,7 +338,7 @@ export type WalletCreateManyInput = {
 export type WalletUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -347,7 +347,7 @@ export type WalletUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -429,6 +429,14 @@ export type WalletUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WalletUpdateToOneWithWhereWithoutUserInput, Prisma.WalletUpdateWithoutUserInput>, Prisma.WalletUncheckedUpdateWithoutUserInput>
 }
 
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type WalletCreateNestedOneWithoutSent_transactionsInput = {
   create?: Prisma.XOR<Prisma.WalletCreateWithoutSent_transactionsInput, Prisma.WalletUncheckedCreateWithoutSent_transactionsInput>
   connectOrCreate?: Prisma.WalletCreateOrConnectWithoutSent_transactionsInput
@@ -462,7 +470,7 @@ export type WalletUpdateOneWithoutReceived_transactionsNestedInput = {
 export type WalletCreateWithoutUserInput = {
   id?: string
   wallet_number: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   sent_transactions?: Prisma.TransactionCreateNestedManyWithoutWalletInput
@@ -472,7 +480,7 @@ export type WalletCreateWithoutUserInput = {
 export type WalletUncheckedCreateWithoutUserInput = {
   id?: string
   wallet_number: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   sent_transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutWalletInput
@@ -498,7 +506,7 @@ export type WalletUpdateToOneWithWhereWithoutUserInput = {
 export type WalletUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sent_transactions?: Prisma.TransactionUpdateManyWithoutWalletNestedInput
@@ -508,7 +516,7 @@ export type WalletUpdateWithoutUserInput = {
 export type WalletUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sent_transactions?: Prisma.TransactionUncheckedUpdateManyWithoutWalletNestedInput
@@ -518,7 +526,7 @@ export type WalletUncheckedUpdateWithoutUserInput = {
 export type WalletCreateWithoutSent_transactionsInput = {
   id?: string
   wallet_number: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   user: Prisma.UserCreateNestedOneWithoutWalletInput
@@ -529,7 +537,7 @@ export type WalletUncheckedCreateWithoutSent_transactionsInput = {
   id?: string
   wallet_number: string
   user_id: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   received_transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiver_walletInput
@@ -543,7 +551,7 @@ export type WalletCreateOrConnectWithoutSent_transactionsInput = {
 export type WalletCreateWithoutReceived_transactionsInput = {
   id?: string
   wallet_number: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   user: Prisma.UserCreateNestedOneWithoutWalletInput
@@ -554,7 +562,7 @@ export type WalletUncheckedCreateWithoutReceived_transactionsInput = {
   id?: string
   wallet_number: string
   user_id: string
-  balance?: number
+  balance?: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
   sent_transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutWalletInput
@@ -579,7 +587,7 @@ export type WalletUpdateToOneWithWhereWithoutSent_transactionsInput = {
 export type WalletUpdateWithoutSent_transactionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutWalletNestedInput
@@ -590,7 +598,7 @@ export type WalletUncheckedUpdateWithoutSent_transactionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   received_transactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiver_walletNestedInput
@@ -610,7 +618,7 @@ export type WalletUpdateToOneWithWhereWithoutReceived_transactionsInput = {
 export type WalletUpdateWithoutReceived_transactionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutWalletNestedInput
@@ -621,7 +629,7 @@ export type WalletUncheckedUpdateWithoutReceived_transactionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   wallet_number?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sent_transactions?: Prisma.TransactionUncheckedUpdateManyWithoutWalletNestedInput
@@ -734,7 +742,7 @@ export type $WalletPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: string
     wallet_number: string
     user_id: string
-    balance: number
+    balance: bigint
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["wallet"]>
@@ -1166,7 +1174,7 @@ export interface WalletFieldRefs {
   readonly id: Prisma.FieldRef<"Wallet", 'String'>
   readonly wallet_number: Prisma.FieldRef<"Wallet", 'String'>
   readonly user_id: Prisma.FieldRef<"Wallet", 'String'>
-  readonly balance: Prisma.FieldRef<"Wallet", 'Int'>
+  readonly balance: Prisma.FieldRef<"Wallet", 'BigInt'>
   readonly created_at: Prisma.FieldRef<"Wallet", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Wallet", 'DateTime'>
 }

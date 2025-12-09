@@ -27,7 +27,6 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   handleRequest<TUser = any>(err: any, user: TUser): TUser {
     if (err) {
       this.logger.error('Google Auth Guard Error', err);
-      console.log('Google Auth Guard Error:', err);
       throw new BadRequestException(
         'Google authentication failed: Invalid Token',
       );
