@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  engineType   = "adapter-pg"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  first_name      String
+  last_name       String
+  profile_picture String?
+  password        String?
+  google_id       String?  @unique
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  wallet          Wallet?
+  keys            Key[]
+
+  @@map("users")
+}
+
+model Key {
+  id          String   @id @default(uuid())
+  user_id     String
+  user        User     @relation(fields: [user_id], references: [id])
+  name        String
+  api_key     String   @unique
+  permissions String[]
+  version     Int      @default(0)
+  expires_at  DateTime
+  revoked     Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([user_id, name, version])
+  @@map("user_api_keys")
+}
+
+model Wallet {
+  id                    String        @id @default(uuid())
+  wallet_number         String        @unique
+  user_id               String        @unique
+  user                  User          @relation(fields: [user_id], references: [id])
+  balance               Int           @default(0)
+  created_at            DateTime      @default(now())
+  updated_at            DateTime      @updatedAt
+  sent_transactions     Transaction[] @relation("SentTransactions")
+  received_transactions Transaction[] @relation("ReceivedTransactions")
+
+  @@map("user_wallets")
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  wallet_id String // for deposit or outgoing transfer
+  wallet    Wallet @relation("SentTransactions", fields: [wallet_id], references: [id])
+
+  receiver_wallet_id String?
+  receiver_wallet    Wallet? @relation("ReceivedTransactions", fields: [receiver_wallet_id], references: [id])
+
+  type              TransactionType
+  amount            Int
+  idempotency_key   String          @unique
+  reference         String          @unique
+  authorization_url String?
+
+  status          TransactionStatus @default(pending)
+  paid_at         DateTime?
+  webhook_payload Json?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+
+  @@index([wallet_id])
+  @@index([receiver_wallet_id])
+  @@map("payments")
+}
+
+enum TransactionStatus {
+  pending
+  success
+  failed
+  abandoned
+}
+
+enum TransactionType {
+  deposit
+  transfer
+}

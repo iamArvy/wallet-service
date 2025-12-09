@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: wallet-service-postgres-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${DB_USER:-app-db-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-app-db-password}
+      POSTGRES_DB: ${DB_NAME:-app-db}
+
+    ports:
+      - "${DB_PORT:-5432}:5432"
+
+    volumes:
+      - wallet-service-data:/var/lib/postgresql/data
+
+    networks:
+      - wallet-service-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-app-db-user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  wallet-service-data:
+
+networks:
+  wallet-service-network:
