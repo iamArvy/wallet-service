@@ -229,8 +229,8 @@ export type TransactionGroupByOutputType = {
   receiver_wallet_id: string | null
   type: $Enums.TransactionType
   amount: bigint
-  idempotency_key: string
-  reference: string
+  idempotency_key: string | null
+  reference: string | null
   authorization_url: string | null
   status: $Enums.TransactionStatus
   paid_at: Date | null
@@ -268,8 +268,8 @@ export type TransactionWhereInput = {
   receiver_wallet_id?: Prisma.StringNullableFilter<"Transaction"> | string | null
   type?: Prisma.EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
   amount?: Prisma.BigIntFilter<"Transaction"> | bigint | number
-  idempotency_key?: Prisma.StringFilter<"Transaction"> | string
-  reference?: Prisma.StringFilter<"Transaction"> | string
+  idempotency_key?: Prisma.StringNullableFilter<"Transaction"> | string | null
+  reference?: Prisma.StringNullableFilter<"Transaction"> | string | null
   authorization_url?: Prisma.StringNullableFilter<"Transaction"> | string | null
   status?: Prisma.EnumTransactionStatusFilter<"Transaction"> | $Enums.TransactionStatus
   paid_at?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
@@ -286,8 +286,8 @@ export type TransactionOrderByWithRelationInput = {
   receiver_wallet_id?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  idempotency_key?: Prisma.SortOrder
-  reference?: Prisma.SortOrder
+  idempotency_key?: Prisma.SortOrderInput | Prisma.SortOrder
+  reference?: Prisma.SortOrderInput | Prisma.SortOrder
   authorization_url?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   paid_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -325,8 +325,8 @@ export type TransactionOrderByWithAggregationInput = {
   receiver_wallet_id?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  idempotency_key?: Prisma.SortOrder
-  reference?: Prisma.SortOrder
+  idempotency_key?: Prisma.SortOrderInput | Prisma.SortOrder
+  reference?: Prisma.SortOrderInput | Prisma.SortOrder
   authorization_url?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   paid_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -349,8 +349,8 @@ export type TransactionScalarWhereWithAggregatesInput = {
   receiver_wallet_id?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   type?: Prisma.EnumTransactionTypeWithAggregatesFilter<"Transaction"> | $Enums.TransactionType
   amount?: Prisma.BigIntWithAggregatesFilter<"Transaction"> | bigint | number
-  idempotency_key?: Prisma.StringWithAggregatesFilter<"Transaction"> | string
-  reference?: Prisma.StringWithAggregatesFilter<"Transaction"> | string
+  idempotency_key?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
+  reference?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   authorization_url?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   status?: Prisma.EnumTransactionStatusWithAggregatesFilter<"Transaction"> | $Enums.TransactionStatus
   paid_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Transaction"> | Date | string | null
@@ -363,8 +363,8 @@ export type TransactionCreateInput = {
   id?: string
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -381,8 +381,8 @@ export type TransactionUncheckedCreateInput = {
   receiver_wallet_id?: string | null
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -395,8 +395,8 @@ export type TransactionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -413,8 +413,8 @@ export type TransactionUncheckedUpdateInput = {
   receiver_wallet_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -429,8 +429,8 @@ export type TransactionCreateManyInput = {
   receiver_wallet_id?: string | null
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -443,8 +443,8 @@ export type TransactionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -459,8 +459,8 @@ export type TransactionUncheckedUpdateManyInput = {
   receiver_wallet_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -633,8 +633,8 @@ export type TransactionCreateWithoutWalletInput = {
   id?: string
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -649,8 +649,8 @@ export type TransactionUncheckedCreateWithoutWalletInput = {
   receiver_wallet_id?: string | null
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -673,8 +673,8 @@ export type TransactionCreateWithoutReceiver_walletInput = {
   id?: string
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -689,8 +689,8 @@ export type TransactionUncheckedCreateWithoutReceiver_walletInput = {
   wallet_id: string
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -734,8 +734,8 @@ export type TransactionScalarWhereInput = {
   receiver_wallet_id?: Prisma.StringNullableFilter<"Transaction"> | string | null
   type?: Prisma.EnumTransactionTypeFilter<"Transaction"> | $Enums.TransactionType
   amount?: Prisma.BigIntFilter<"Transaction"> | bigint | number
-  idempotency_key?: Prisma.StringFilter<"Transaction"> | string
-  reference?: Prisma.StringFilter<"Transaction"> | string
+  idempotency_key?: Prisma.StringNullableFilter<"Transaction"> | string | null
+  reference?: Prisma.StringNullableFilter<"Transaction"> | string | null
   authorization_url?: Prisma.StringNullableFilter<"Transaction"> | string | null
   status?: Prisma.EnumTransactionStatusFilter<"Transaction"> | $Enums.TransactionStatus
   paid_at?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
@@ -765,8 +765,8 @@ export type TransactionCreateManyWalletInput = {
   receiver_wallet_id?: string | null
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -780,8 +780,8 @@ export type TransactionCreateManyReceiver_walletInput = {
   wallet_id: string
   type: $Enums.TransactionType
   amount: bigint | number
-  idempotency_key: string
-  reference: string
+  idempotency_key?: string | null
+  reference?: string | null
   authorization_url?: string | null
   status?: $Enums.TransactionStatus
   paid_at?: Date | string | null
@@ -794,8 +794,8 @@ export type TransactionUpdateWithoutWalletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -810,8 +810,8 @@ export type TransactionUncheckedUpdateWithoutWalletInput = {
   receiver_wallet_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -825,8 +825,8 @@ export type TransactionUncheckedUpdateManyWithoutWalletInput = {
   receiver_wallet_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -839,8 +839,8 @@ export type TransactionUpdateWithoutReceiver_walletInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -855,8 +855,8 @@ export type TransactionUncheckedUpdateWithoutReceiver_walletInput = {
   wallet_id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -870,8 +870,8 @@ export type TransactionUncheckedUpdateManyWithoutReceiver_walletInput = {
   wallet_id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   amount?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  idempotency_key?: Prisma.StringFieldUpdateOperationsInput | string
-  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotency_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   authorization_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -978,8 +978,8 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     receiver_wallet_id: string | null
     type: $Enums.TransactionType
     amount: bigint
-    idempotency_key: string
-    reference: string
+    idempotency_key: string | null
+    reference: string | null
     authorization_url: string | null
     status: $Enums.TransactionStatus
     paid_at: Date | null

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsInt, Min } from 'class-validator';
+import { Transaction } from 'src/generated/prisma/client';
 
 export class DepositRequestDto {
   @ApiProperty({
@@ -28,7 +29,7 @@ export class DepositResponseDto {
   })
   authorization_url: string;
 
-  constructor(partial: Partial<DepositResponseDto>) {
+  constructor(partial: Partial<Transaction>) {
     Object.assign(this, partial);
   }
 }

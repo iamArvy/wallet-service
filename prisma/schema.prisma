@@ -73,8 +73,8 @@ model Transaction {
 
   type              TransactionType
   amount            BigInt
-  idempotency_key   String          @unique
-  reference         String          @unique
+  idempotency_key   String?         @unique
+  reference         String?         @unique
   authorization_url String?
 
   status          TransactionStatus @default(pending)

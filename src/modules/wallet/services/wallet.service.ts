@@ -18,6 +18,7 @@ import {
   DepositResponseDto,
   TransactionResponseDto,
   TransactionStatusDto,
+  TransferRequestDto,
   WalletBalanceDto,
 } from '../dto';
 import { Prisma } from 'src/generated/prisma/client';
@@ -167,6 +168,62 @@ export class WalletService {
     });
 
     this.logger.info(`Transaction processed successfully: ${reference}`);
+  }
+
+  async transfer(user: IJwtUser, payload: TransferRequestDto) {
+    const { wallet_number, amount } = payload;
+    const transferAmount = BigInt(amount);
+    const userWallet = await this.prisma.wallet.findUnique({
+      where: {
+        user_id: user.id,
+      },
+    });
+
+    if (!userWallet) throw new NotFoundException('User wallet not found');
+
+    const recipientWallet = await this.prisma.wallet.findUnique({
+      where: { wallet_number },
+    });
+
+    if (!recipientWallet) throw new NotFoundException('Recipient not found');
+
+    if (transferAmount > userWallet.balance)
+      throw new BadRequestException('Insufficient balance');
+
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.transaction.create({
+        data: {
+          amount: transferAmount,
+          wallet: {
+            connect: { id: userWallet.id },
+          },
+          receiver_wallet: {
+            connect: { id: recipientWallet.id },
+          },
+          type: TransactionType.transfer,
+        },
+      });
+
+      await prisma.wallet.update({
+        where: {
+          id: userWallet.id,
+        },
+        data: {
+          balance: userWallet.balance - transferAmount,
+        },
+      });
+
+      await prisma.wallet.update({
+        where: {
+          id: recipientWallet.id,
+        },
+        data: {
+          balance: recipientWallet.balance + transferAmount,
+        },
+      });
+    });
+
+    return { status: 'success', message: 'Transfer completed' };
   }
 
   private mapPaystackStatus = (status: string): TransactionStatus => {
