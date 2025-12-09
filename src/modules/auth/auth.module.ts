@@ -7,6 +7,10 @@ import { GoogleAuthService } from './services';
 import { GoogleStrategy } from './strategies';
 import { TokenService } from './services/token.service';
 import { IJwtConfig } from 'src/config';
+import { JWTAuthGuard } from './guards';
+import { ApiKeyGuard } from './guards/api-key.guard';
+import { CombinedAuthGuard } from './guards/combined.guard';
+import { ApiKeyPermissionsGuard } from './guards/api-key-permission.guard';
 
 @Module({
   imports: [
@@ -20,7 +24,22 @@ import { IJwtConfig } from 'src/config';
     }),
   ],
   controllers: [GoogleAuthController],
-  providers: [GoogleAuthService, GoogleStrategy, JwtStrategy, TokenService],
-  exports: [JwtStrategy],
+  providers: [
+    GoogleAuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    TokenService,
+    JWTAuthGuard,
+    ApiKeyGuard,
+    CombinedAuthGuard,
+    ApiKeyPermissionsGuard,
+  ],
+  exports: [
+    JwtStrategy,
+    JWTAuthGuard,
+    ApiKeyGuard,
+    CombinedAuthGuard,
+    ApiKeyPermissionsGuard,
+  ],
 })
 export class AuthModule {}

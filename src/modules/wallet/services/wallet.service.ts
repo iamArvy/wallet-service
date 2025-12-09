@@ -8,8 +8,6 @@ import { PrismaService } from 'src/db/prisma.service';
 import { IJwtUser } from 'src/common/types';
 import { PaystackHttpClient } from 'src/integrations/paystack';
 import { TransactionStatus, TransactionType } from 'src/generated/prisma/enums';
-import { randomInt } from 'crypto';
-import { Prisma } from 'src/generated/prisma/client';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { DepositResponseDto, TransactionStatusDto } from '../dto';
@@ -26,37 +24,37 @@ export class WalletService {
     this.logger = baseLogger.child({ context: WalletService.name });
   }
 
-  async create(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) {
-      this.logger.error('User not found');
-      return;
-    }
-    while (true) {
-      const wallet_number = this.generateWalletNumber();
+  // async create(userId: string) {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //   });
+  //   if (!user) {
+  //     this.logger.error('User not found');
+  //     return;
+  //   }
+  //   while (true) {
+  //     const wallet_number = this.generateWalletNumber();
 
-      try {
-        return await this.prisma.wallet.create({
-          data: {
-            user_id: userId,
-            wallet_number,
-          },
-        });
-      } catch (err) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-          if (err.code === 'P2002') {
-            // retry generating wallet number
-            continue;
-          }
-        }
+  //     try {
+  //       return await this.prisma.wallet.create({
+  //         data: {
+  //           user_id: userId,
+  //           wallet_number,
+  //         },
+  //       });
+  //     } catch (err) {
+  //       if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  //         if (err.code === 'P2002') {
+  //           // retry generating wallet number
+  //           continue;
+  //         }
+  //       }
 
-        // Unhandled errors -> rethrow
-        throw err;
-      }
-    }
-  }
+  //       // Unhandled errors -> rethrow
+  //       throw err;
+  //     }
+  //   }
+  // }
 
   async deposit(rUser: IJwtUser, amount: number, idempotency_key: string) {
     const user = await this.prisma.user.findUnique({
@@ -101,10 +99,12 @@ export class WalletService {
   }
 
   async getBalance(userId: string) {
+    console.log(userId);
     const wallet = await this.prisma.wallet.findUnique({
       where: { user_id: userId },
       select: { balance: true },
     });
+    console.log(wallet);
     return wallet;
   }
 
@@ -153,13 +153,5 @@ export class WalletService {
       default:
         return TransactionStatus.pending;
     }
-  };
-
-  private generateWalletNumber = (): string => {
-    // Example: timestamp (ms) last 8 digits + 6 random digits = 14 digits
-    const timePart = Date.now().toString().slice(-8); // last 8 digits of timestamp
-    const randomPart = randomInt(100000, 999999).toString(); // 6 random digits
-
-    return `${timePart}${randomPart}`; // 14 digits
   };
 }

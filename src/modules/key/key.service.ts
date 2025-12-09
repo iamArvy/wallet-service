@@ -79,7 +79,10 @@ export class KeyService {
         user_id,
       },
     });
-    if (!expiredKey) throw new NotFoundException('Key not found');
+    if (!expiredKey || expiredKey.revoked)
+      throw new NotFoundException('Key not found');
+    if (expiredKey.expires_at > new Date())
+      throw new BadRequestException('Only expired keys can be rolled over');
     const expires_at = this.mapExpiryDate(expiry);
     const api_key = await this.generateApiKey();
     const key = await this.prisma.$transaction(async (prisma) => {

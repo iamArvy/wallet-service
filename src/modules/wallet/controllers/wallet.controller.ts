@@ -22,12 +22,18 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JWTAuthGuard } from 'src/modules/auth/guards';
 import { WalletService } from '../services';
+import { CombinedAuthGuard } from 'src/modules/auth/guards/combined.guard';
+import {
+  ApiKeyPermissions,
+  ApiKeyPermissionsGuard,
+} from 'src/modules/auth/guards/api-key-permission.guard';
 
 @Controller('wallet')
 export class WalletController {
@@ -118,9 +124,13 @@ export class WalletController {
     return this.service.statusCheck(reference, refresh);
   }
 
+  @ApiBearerAuth()
+  @ApiKeyPermissions('read')
+  @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
+  @ApiHeader({ name: 'x-api-key' })
   @Get('balance')
-  balance() {
-    return this.service.getBalance('user-id');
+  balance(@Req() { user }: IRequestWithUser<IJwtUser>) {
+    return this.service.getBalance(user.id);
   }
 
   // @Post('transfer')

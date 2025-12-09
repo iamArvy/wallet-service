@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface IGoogleUser {
   sub: string;
   email: string;
@@ -12,6 +14,9 @@ export interface IJwtUser {
   email: string;
 }
 
-export interface IRequestWithUser<T> {
+export interface IRequestWithUser<
+  T extends Express.User | undefined = Express.User,
+> extends Request {
   user: T;
+  apiKeyPermissions: string[];
 }

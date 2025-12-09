@@ -6,6 +6,7 @@ import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
 import { TokenService } from './token.service';
 import { PrismaService } from 'src/db/prisma.service';
 import { IGoogleConfig } from 'src/config';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class GoogleAuthService {
@@ -53,6 +54,11 @@ export class GoogleAuthService {
         first_name: gUser.given_name,
         last_name: gUser.family_name,
         profile_picture: gUser.picture,
+        wallet: {
+          create: {
+            wallet_number: this.generateWalletNumber(),
+          },
+        },
       },
       update: {
         email: gUser.email,
@@ -61,10 +67,18 @@ export class GoogleAuthService {
         profile_picture: gUser.picture,
       },
     });
+
     const access = await this.token.access(user.id, user.email);
     return {
       user: new UserResponseDto(user),
       access,
     };
   }
+
+  private generateWalletNumber = (): string => {
+    const timePart = Date.now().toString().slice(-8);
+    const randomPart = randomInt(100000, 999999).toString();
+
+    return `${timePart}${randomPart}`;
+  };
 }
