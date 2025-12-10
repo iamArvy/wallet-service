@@ -89,14 +89,10 @@ export class WalletService {
   async getTransactions(user_id: string) {
     const transactions = await this.prisma.transaction.findMany({
       where: {
-        wallet: {
-          user_id,
-        },
-        receiver_wallet: {
-          user_id,
-        },
+        OR: [{ wallet: { user_id } }, { receiver_wallet: { user_id } }],
       },
     });
+
     const transactionDtos = transactions.map(
       (tx) => new TransactionResponseDto(tx),
     );
