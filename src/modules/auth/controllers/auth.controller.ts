@@ -7,10 +7,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from '../services';
-import type { IGoogleUser, IRequestWithUser } from 'src/common/types';
-import { GoogleAuthGuard } from '../guards';
+import type { IGoogleUser, IJwtUser, IRequestWithUser } from 'src/common/types';
+import { GoogleAuthGuard, JWTAuthGuard } from '../guards';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -41,7 +42,14 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Bad Request - Invalid Token' })
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  handleGoogleCallback(@Req() req: IRequestWithUser<IGoogleUser>) {
-    return this.service.handleGoogleCallback(req.user);
+  handleGoogleCallback(@Req() { user }: IRequestWithUser<IGoogleUser>) {
+    return this.service.handleGoogleCallback(user);
+  }
+
+  @Get('me')
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  me(@Req() { user }: IRequestWithUser<IJwtUser>) {
+    return this.service.userAccount(user);
   }
 }

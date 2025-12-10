@@ -12,7 +12,7 @@ export class UserResponseDto {
   first_name: string;
 
   @ApiProperty({ type: String, description: 'Last name of the user' })
-  last_name: string;
+  last_name: string | null;
 
   @ApiProperty({
     type: String,

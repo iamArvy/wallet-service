@@ -17,13 +17,6 @@ export class TransactionResponseDto {
 
   @Expose()
   @ApiProperty({
-    example: 'user_abc123',
-    description: 'ID of the user who owns this transaction',
-  })
-  user_id: string;
-
-  @Expose()
-  @ApiProperty({
     example: '5000000000',
     description:
       'Transaction amount in smallest currency unit (e.g., kobo for NGN)',

@@ -14,7 +14,7 @@ export class TransferRequestDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(10, 10, { message: 'Wallet number must be exactly 10 digits' })
+  @Length(14, 14, { message: 'Wallet number must be exactly 14 digits' })
   wallet_number: string;
 
   @ApiProperty({

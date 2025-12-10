@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import qs from 'qs';
-import { IGoogleUser } from 'src/common/types';
+import { IGoogleUser, IJwtUser } from 'src/common/types';
 import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
 import { TokenService } from './token.service';
 import { PrismaService } from 'src/db/prisma.service';
 import { IGoogleConfig } from 'src/config';
 import { randomInt } from 'crypto';
+import { UserAccount } from '../dto';
 
 @Injectable()
 export class AuthService {
@@ -73,6 +78,29 @@ export class AuthService {
       user: new UserResponseDto(user),
       access,
     };
+  }
+
+  async userAccount(iUser: IJwtUser) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: iUser.id,
+      },
+      include: {
+        wallet: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    // const { ...user, wallet } = user;
+    const wallet = user.wallet
+      ? {
+          ...user.wallet,
+          balance: user.wallet.balance.toString(),
+        }
+      : null;
+
+    return new UserAccount(user, wallet);
   }
 
   private generateWalletNumber = (): string => {

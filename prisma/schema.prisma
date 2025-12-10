@@ -19,7 +19,7 @@ model User {
   id              String   @id @default(uuid())
   email           String   @unique
   first_name      String
-  last_name       String
+  last_name       String?
   profile_picture String?
   password        String?
   google_id       String?  @unique

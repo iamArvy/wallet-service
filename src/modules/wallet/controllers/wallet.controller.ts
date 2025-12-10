@@ -17,6 +17,7 @@ import {
   DepositResponseDto,
   TransactionResponseDto,
   TransactionStatusDto,
+  TransferRequestDto,
 } from '../dto';
 import {
   ApiBadRequestResponse,
@@ -27,7 +28,6 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JWTAuthGuard } from 'src/modules/auth/guards';
 import { WalletService } from '../services';
 import { CombinedAuthGuard } from 'src/modules/auth/guards/combined.guard';
 import {
@@ -48,7 +48,9 @@ export class WalletController {
     type: DepositResponseDto,
   })
   @ApiBearerAuth()
-  @UseGuards(JWTAuthGuard)
+  @ApiKeyPermissions('deposit')
+  @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
+  @ApiHeader({ name: 'x-api-key' })
   @Post('deposit')
   deposit(
     @Req() req: IRequestWithUser<IJwtUser>,
@@ -65,6 +67,10 @@ export class WalletController {
     type: TransactionResponseDto,
     isArray: true,
   })
+  @ApiBearerAuth()
+  @ApiKeyPermissions('read')
+  @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
+  @ApiHeader({ name: 'x-api-key' })
   @Get('transactions')
   getPayments() {
     return this.service.getTransactions();
@@ -104,6 +110,15 @@ export class WalletController {
     return this.service.getBalance(user.id);
   }
 
-  // @Post('transfer')
-  // transfer(@Body() body: any) {}
+  @ApiBearerAuth()
+  @ApiKeyPermissions('transfer')
+  @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
+  @ApiHeader({ name: 'x-api-key' })
+  @Post('transfer')
+  transfer(
+    @Req() { user }: IRequestWithUser<IJwtUser>,
+    @Body() body: TransferRequestDto,
+  ) {
+    return this.service.transfer(user, body);
+  }
 }
