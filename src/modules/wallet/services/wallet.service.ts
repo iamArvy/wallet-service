@@ -92,6 +92,9 @@ export class WalletService {
         wallet: {
           user_id,
         },
+        receiver_wallet: {
+          user_id,
+        },
       },
     });
     const transactionDtos = transactions.map(
