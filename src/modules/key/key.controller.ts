@@ -14,28 +14,24 @@ import {
 } from '@nestjs/common';
 import { KeyService } from './key.service';
 import { CreateKeyDto } from './dto/create-key.dto';
-import { KeyResponseDto, RolloverKeyDto } from './dto';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { RolloverKeyDto } from './dto';
 import { JWTAuthGuard } from '../auth/guards';
+import {
+  CreateKeyDocs,
+  KeyControllerDocs,
+  ListKeysDocs,
+  RevokeKeyDocs,
+  RolloverKeyDocs,
+} from './docs';
 
-@ApiUnauthorizedResponse({ description: 'Unauthorized user' })
-@ApiBearerAuth()
+@KeyControllerDocs()
 @UseGuards(JWTAuthGuard)
 @Controller('keys')
 export class KeyController {
   constructor(private readonly service: KeyService) {}
 
+  @CreateKeyDocs()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Initialize a payment' })
-  @ApiCreatedResponse({
-    description: 'API Key Created',
-    type: KeyResponseDto,
-  })
   @Post()
   create(
     @Req() req: IRequestWithUser<IJwtUser>,
@@ -44,11 +40,13 @@ export class KeyController {
     return this.service.create(req.user.id, createKeyDto);
   }
 
+  @ListKeysDocs()
   @Get()
   findAll(@Req() { user }: IRequestWithUser<IJwtUser>) {
     return this.service.findAll(user.id);
   }
 
+  @RolloverKeyDocs()
   @Post('rollover')
   rollover(
     @Req() { user }: IRequestWithUser<IJwtUser>,
@@ -57,6 +55,7 @@ export class KeyController {
     return this.service.rollover(user.id, body);
   }
 
+  @RevokeKeyDocs()
   @Delete(':id')
   revoke(
     @Req() { user }: IRequestWithUser<IJwtUser>,

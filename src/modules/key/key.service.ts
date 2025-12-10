@@ -11,12 +11,14 @@ import { Logger } from 'winston';
 import { PrismaService } from 'src/db/prisma.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { randomBytes } from 'crypto';
+import { API_KEY_PREFIX, MAX_USER_KEYS } from 'src/common/constants';
+import * as sysMsg from 'src/common/system-messages';
 
 @Injectable()
 export class KeyService {
   private readonly logger: Logger;
-  private readonly maxKeys = 5;
-  private readonly keyPrefix = 'sk_live_';
+  private readonly maxKeys = MAX_USER_KEYS;
+  private readonly keyPrefix = API_KEY_PREFIX;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -35,9 +37,7 @@ export class KeyService {
     });
 
     if (count >= this.maxKeys)
-      throw new BadRequestException(
-        'Key limit reached revoked a key and try again',
-      );
+      throw new BadRequestException(sysMsg.KEYS_LIMIT_REACHED);
 
     const existing = await this.prisma.key.findMany({
       where: {
@@ -46,7 +46,7 @@ export class KeyService {
       },
     });
     if (existing.length > 0)
-      throw new ConflictException('Key with name already exists');
+      throw new ConflictException(sysMsg.KEY_NAME_EXISTS);
     const expires_at = this.mapExpiryDate(expiry);
     const api_key = await this.generateApiKey();
     const key = await this.prisma.key.create({
@@ -80,9 +80,9 @@ export class KeyService {
       },
     });
     if (!expiredKey || expiredKey.revoked)
-      throw new NotFoundException('Key not found');
+      throw new NotFoundException(sysMsg.KEY_NOT_FOUND);
     if (expiredKey.expires_at > new Date())
-      throw new BadRequestException('Only expired keys can be rolled over');
+      throw new BadRequestException(sysMsg.KEY_NOT_EXPIRED);
     const expires_at = this.mapExpiryDate(expiry);
     const api_key = await this.generateApiKey();
     const key = await this.prisma.$transaction(async (prisma) => {
@@ -118,7 +118,9 @@ export class KeyService {
         id,
       },
     });
-    if (!existing) throw new NotFoundException('Key not found');
+    if (!existing) throw new NotFoundException(sysMsg.KEY_NOT_FOUND);
+    if (existing.revoked)
+      throw new BadRequestException(sysMsg.KEY_ALREADY_REVOKED);
     await this.prisma.key.update({
       where: {
         id,
@@ -127,7 +129,7 @@ export class KeyService {
         revoked: true,
       },
     });
-    return 'Key revoked successfully';
+    return sysMsg.KEY_REVOKED;
   }
 
   /**
@@ -166,9 +168,7 @@ export class KeyService {
         now.setFullYear(now.getFullYear() + 1);
         return now;
       default:
-        throw new BadRequestException(
-          'Invalid expiry value. Must be one of 1H, 1D, 1M, 1Y.',
-        );
+        throw new BadRequestException(sysMsg.INVALID_EXPIRY);
     }
   };
 }
