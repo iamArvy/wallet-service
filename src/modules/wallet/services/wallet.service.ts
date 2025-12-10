@@ -210,6 +210,7 @@ export class WalletService {
             connect: { id: recipientWallet.id },
           },
           type: TransactionType.transfer,
+          status: TransactionStatus.success,
         },
       });
 
