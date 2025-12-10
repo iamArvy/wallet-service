@@ -4,3 +4,4 @@ export * from './transaction-status.dto';
 export * from './transaction-response.dto';
 export * from './wallet-balance.dto';
 export * from './transfer.dto';
+export * from './list-transactions.dto';

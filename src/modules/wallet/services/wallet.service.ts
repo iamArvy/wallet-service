@@ -8,7 +8,9 @@ import {
 import { PrismaService } from 'src/db/prisma.service';
 import { IJwtUser } from 'src/common/types';
 import {
+  IPaystackWebhookData,
   IPaystackWebhookInterface,
+  PAYSTACK_EVENTS,
   PaystackHttpClient,
 } from 'src/integrations/paystack';
 import { TransactionStatus, TransactionType } from 'src/generated/prisma/enums';
@@ -23,6 +25,7 @@ import {
 } from '../dto';
 import { Prisma } from 'src/generated/prisma/client';
 import { ListTransactionsDto } from '../dto/list-transactions.dto';
+import * as sysMsg from 'src/common/system-messages';
 
 @Injectable()
 export class WalletService {
@@ -37,13 +40,11 @@ export class WalletService {
   }
 
   async deposit(rUser: IJwtUser, amount: number, idempotency_key: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: rUser.id },
-      select: { wallet: true },
+    const wallet = await this.prisma.wallet.findUnique({
+      where: { user_id: rUser.id },
     });
 
-    if (!user) throw new NotFoundException('User not found');
-    if (!user.wallet) throw new BadRequestException('Wallet does not exist');
+    if (!wallet) throw new NotFoundException(sysMsg.WALLET_NOT_FOUND);
 
     const existing = await this.prisma.transaction.findUnique({
       where: { idempotency_key },
@@ -56,8 +57,6 @@ export class WalletService {
           authorization_url: existing.authorization_url,
         });
     }
-
-    const wallet = user.wallet;
 
     const response = await this.paystackClient.initializePayment(
       rUser.email,
@@ -83,12 +82,18 @@ export class WalletService {
       where: { user_id: userId },
       select: { balance: true },
     });
-    if (!wallet) throw new NotFoundException('Wallet not foud');
+    if (!wallet) throw new NotFoundException(sysMsg.WALLET_NOT_FOUND);
     return new WalletBalanceDto(wallet);
   }
 
-  async getTransactions() {
-    const transactions = await this.prisma.transaction.findMany();
+  async getTransactions(user_id: string) {
+    const transactions = await this.prisma.transaction.findMany({
+      where: {
+        wallet: {
+          user_id,
+        },
+      },
+    });
     const transactionDtos = transactions.map(
       (tx) => new TransactionResponseDto(tx),
     );
@@ -96,15 +101,15 @@ export class WalletService {
     return new ListTransactionsDto({ items: transactionDtos });
   }
 
-  async statusCheck(reference: string, refresh: boolean) {
+  async statusCheck(reference: string) {
     const transaction = await this.prisma.transaction.findUnique({
       where: { reference },
     });
 
     if (!transaction) {
-      throw new NotFoundException('Transaction not found');
+      throw new NotFoundException(sysMsg.TRANSACTION_NOT_FOUND);
     }
-    if (transaction.status === TransactionStatus.pending || refresh) {
+    if (transaction.status === TransactionStatus.pending) {
       const response = await this.paystackClient.verifyPayment(reference);
       return new TransactionStatusDto(response);
     }
@@ -116,14 +121,20 @@ export class WalletService {
     payload: IPaystackWebhookInterface,
   ) {
     const valid = this.paystackClient.validateWebhookEvent(signature, payload);
-    if (!valid) throw new UnauthorizedException('Invalid Request');
+    if (!valid) throw new UnauthorizedException(sysMsg.INVALID_REQUEST);
+    const { event, data } = payload;
 
-    if (payload.event !== 'charge.success') {
-      this.logger.warn(`Unhandled webhook event: ${payload.event}`);
-      return;
+    switch (event) {
+      case PAYSTACK_EVENTS.CHARGE_SUCCESS:
+        return this.handleChargeSuccessEvent(data);
+      default:
+        this.logger.warn(sysMsg.UNHANDLED_WEBHOOK_EVENT(event));
+        return;
     }
+  }
 
-    const { reference, status } = payload.data;
+  private async handleChargeSuccessEvent(data: IPaystackWebhookData) {
+    const { reference, status } = data;
 
     const transaction = await this.prisma.transaction.findUnique({
       where: { reference },
@@ -131,19 +142,17 @@ export class WalletService {
     });
 
     if (!transaction) {
-      this.logger.error(`Transaction not found for reference: ${reference}`);
+      this.logger.error(sysMsg.TRANSACTION_NOT_FOUND_FOR_REFERENCE(reference));
       return;
     }
 
     if (transaction.status === TransactionStatus.success) {
-      this.logger.warn(
-        `Duplicate webhook received — transaction already processed: ${reference}`,
-      );
+      this.logger.warn(sysMsg.DUPLICATE_WEBHOOK_RECEIVED(reference));
       return;
     }
 
     if (status !== 'success') {
-      this.logger.warn(`Status is not success for reference ${reference}`);
+      this.logger.warn(sysMsg.CHARGE_SUCCESS_STATUS_NOT_SUCCESS(reference));
       return;
     }
 
@@ -152,9 +161,9 @@ export class WalletService {
         where: { id: transaction.id },
         data: {
           status: TransactionStatus.success,
-          paid_at: new Date(payload.data.paid_at ?? new Date()),
+          paid_at: new Date(data.paid_at ?? new Date()),
           webhook_payload: JSON.parse(
-            JSON.stringify(payload),
+            JSON.stringify(data),
           ) as unknown as Prisma.InputJsonValue,
         },
       });
@@ -167,7 +176,7 @@ export class WalletService {
       });
     });
 
-    this.logger.info(`Transaction processed successfully: ${reference}`);
+    this.logger.info(sysMsg.WEBHOOK_PROCESSED_SUCCESSFULLY(reference));
   }
 
   async transfer(user: IJwtUser, payload: TransferRequestDto) {
@@ -179,16 +188,17 @@ export class WalletService {
       },
     });
 
-    if (!userWallet) throw new NotFoundException('User wallet not found');
+    if (!userWallet) throw new NotFoundException(sysMsg.WALLET_NOT_FOUND);
 
     const recipientWallet = await this.prisma.wallet.findUnique({
       where: { wallet_number },
     });
 
-    if (!recipientWallet) throw new NotFoundException('Recipient not found');
+    if (!recipientWallet)
+      throw new BadRequestException(sysMsg.RECIPIENT_WALLET_NOT_FOUND);
 
     if (transferAmount > userWallet.balance)
-      throw new BadRequestException('Insufficient balance');
+      throw new BadRequestException(sysMsg.INSUFFICIENT_BALANCE);
 
     await this.prisma.$transaction(async (prisma) => {
       await prisma.transaction.create({
@@ -223,19 +233,6 @@ export class WalletService {
       });
     });
 
-    return { status: 'success', message: 'Transfer completed' };
+    return { status: 'success', message: sysMsg.TRANSFER_COMPLETED };
   }
-
-  private mapPaystackStatus = (status: string): TransactionStatus => {
-    switch (status) {
-      case 'success':
-        return TransactionStatus.success;
-      case 'failed':
-        return TransactionStatus.failed;
-      case 'abandoned':
-        return TransactionStatus.abandoned;
-      default:
-        return TransactionStatus.pending;
-    }
-  };
 }
