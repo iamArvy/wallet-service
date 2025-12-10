@@ -14,7 +14,7 @@ import {
 
 export const CreateKeyDocs = () => {
   return applyDecorators(
-    ApiOperation({ summary: 'Initialize a payment' }),
+    ApiOperation({ summary: 'create api key with permissions and expiry' }),
     ApiCreatedResponse({
       description: KEY_CREATED,
       type: KeyResponseDto,

@@ -31,6 +31,7 @@ import {
   StatusCheckDocs,
   TransferDocs,
 } from '../docs';
+import { API_PERMISSIONS } from 'src/common/enums';
 
 @Controller('wallet')
 export class WalletController {
@@ -38,7 +39,7 @@ export class WalletController {
 
   @DepositDocs()
   @HttpCode(HttpStatus.CREATED)
-  @ApiKeyPermissions('deposit')
+  @ApiKeyPermissions(API_PERMISSIONS.DEPOSIT)
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
   @Post('deposit')
   deposit(
@@ -51,7 +52,7 @@ export class WalletController {
 
   @GetTransactionsDocs()
   @HttpCode(HttpStatus.OK)
-  @ApiKeyPermissions('read')
+  @ApiKeyPermissions(API_PERMISSIONS.READ)
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
   @Get('transactions')
   getTransactions(@Req() { user }: IRequestWithUser<IJwtUser>) {
@@ -75,7 +76,7 @@ export class WalletController {
   }
 
   @GetBalanceDocs()
-  @ApiKeyPermissions('read')
+  @ApiKeyPermissions(API_PERMISSIONS.READ)
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
   @Get('balance')
   balance(@Req() { user }: IRequestWithUser<IJwtUser>) {
@@ -83,7 +84,7 @@ export class WalletController {
   }
 
   @TransferDocs()
-  @ApiKeyPermissions('transfer')
+  @ApiKeyPermissions(API_PERMISSIONS.TRANSFER)
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
   @Post('transfer')
   transfer(

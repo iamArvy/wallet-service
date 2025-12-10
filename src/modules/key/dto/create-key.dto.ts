@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
+import { API_PERMISSIONS } from 'src/common/enums';
 
 export class CreateKeyDto {
   @ApiProperty({
@@ -18,17 +19,17 @@ export class CreateKeyDto {
 
   @ApiProperty({
     description: 'Permissions assigned to the API key',
-    example: ['deposit', 'transfer', 'read'],
+    example: [API_PERMISSIONS.DEPOSIT, API_PERMISSIONS.TRANSFER],
     isArray: true,
-    enum: ['deposit', 'transfer', 'read'],
+    enum: API_PERMISSIONS,
   })
   @IsArray()
   @ArrayNotEmpty({ message: 'At least one permission must be specified' })
-  @IsIn(['deposit', 'transfer', 'read'], {
+  @IsIn(Object.values(API_PERMISSIONS), {
     each: true,
     message: 'Invalid permission provided',
   })
-  permissions: string[];
+  permissions: API_PERMISSIONS[];
 
   @ApiProperty({
     description: 'Expiry duration for the key',
