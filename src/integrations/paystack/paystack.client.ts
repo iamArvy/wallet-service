@@ -8,19 +8,22 @@ import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { IPaystackConfig } from 'src/config';
-import {
-  IVerifyPaymentResponse,
-  IInitializePaymentResponse,
-} from './interfaces';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { IPaystackWebhookInterface } from './interfaces/webhook.interface';
+import {
+  IInitializePaymentResponse,
+  IPaystackWebhookInterface,
+  IVerifyPaymentResponse,
+} from './interfaces';
+
+import * as sysMsg from 'src/common/system-messages';
+import { IPaystackConfig } from 'src/config';
+import { PAYSTACK_BASE_URL, PAYSTACK_CONFIG_NAME } from './paystack.constants';
 
 @Injectable()
 export class PaystackHttpClient {
   protected axiosClient: AxiosInstance;
   private readonly logger: Logger;
-  private baseUrl = 'https://api.paystack.co';
+  private baseUrl = PAYSTACK_BASE_URL;
   private secret: string;
 
   constructor(
@@ -28,7 +31,7 @@ export class PaystackHttpClient {
     config: ConfigService,
   ) {
     this.logger = baseLogger.child({ context: PaystackHttpClient.name });
-    const { secret } = config.getOrThrow<IPaystackConfig>('payment.paystack');
+    const { secret } = config.getOrThrow<IPaystackConfig>(PAYSTACK_CONFIG_NAME);
     this.secret = secret;
 
     this.axiosClient = axios.create({
@@ -52,7 +55,7 @@ export class PaystackHttpClient {
    */
   async request<T>(config: AxiosRequestConfig): Promise<T> {
     if (!this.axiosClient.defaults.headers.Authorization) {
-      throw new ServiceUnavailableException('Paystack not configured');
+      throw new ServiceUnavailableException(sysMsg.PAYSTACK_NOT_CONFIGURED);
     }
 
     const res = await this.axiosClient.request<T>(config);

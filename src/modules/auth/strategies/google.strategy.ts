@@ -2,13 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
-import {
-  IGoogleConfig,
-  GOOGLE_CONFIG_NAME,
-  GOOGLE_SCOPE,
-} from 'src/integrations/google';
 import * as constants from 'src/common/constants';
 import { IGoogleProfile } from 'src/common/types';
+import { IGoogleConfig } from 'src/config';
+import { GOOGLE_CONFIG_NAME, GOOGLE_SCOPE } from 'src/integrations/google';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(

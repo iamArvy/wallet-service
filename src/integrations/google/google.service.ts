@@ -1,4 +1,7 @@
 import { ConfigService } from '@nestjs/config';
+import qs from 'qs';
+import { Injectable } from '@nestjs/common';
+import { IGoogleConfig } from 'src/config';
 import {
   GOOGLE_ACCESS_TYPE,
   GOOGLE_CONFIG_NAME,
@@ -7,10 +10,6 @@ import {
   GOOGLE_RESPONSE_TYPE,
   GOOGLE_SCOPE,
 } from './google.constants';
-import { IGoogleConfig } from './google.config';
-import qs from 'qs';
-import { Injectable } from '@nestjs/common';
-
 @Injectable()
 export class GoogleService {
   private configName = GOOGLE_CONFIG_NAME;

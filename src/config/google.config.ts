@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
-import { GOOGLE_CONFIG_NAME } from './google.constants';
+import { GOOGLE_CONFIG_NAME } from 'src/integrations/google';
 
 export interface IGoogleConfig {
   clientId: string;

@@ -34,7 +34,7 @@ import {
   ApiKeyPermissions,
   ApiKeyPermissionsGuard,
 } from 'src/modules/auth/guards/api-key-permission.guard';
-import type { IPaystackWebhookInterface } from 'src/integrations/paystack/interfaces/webhook.interface';
+import { type IPaystackWebhookInterface } from 'src/integrations/paystack';
 
 @Controller('wallet')
 export class WalletController {

@@ -17,35 +17,13 @@ import { GoogleService } from 'src/integrations/google';
 
 @Injectable()
 export class AuthService {
-  // private googleOauthURL = 'https://accounts.google.com/o/oauth2/v2/auth';
-
-  // private clientId: string;
-  // private redirectUri: string;
-
   constructor(
-    // config: ConfigService,
     private readonly token: TokenService,
     private readonly prisma: PrismaService,
     private readonly google: GoogleService,
-  ) {
-    // const { clientId, redirectUri } =
-    //   config.getOrThrow<IGoogleConfig>('auth.google');
-    // this.clientId = clientId;
-    // this.redirectUri = redirectUri;
-  }
-  redirectToGoogle() {
-    // const url =
-    //   this.googleOauthURL +
-    //   '?' +
-    //   qs.stringify({
-    //     client_id: this.clientId,
-    //     redirect_uri: this.redirectUri,
-    //     response_type: 'code',
-    //     scope: ['openid', 'email', 'profile'].join(' '),
-    //     access_type: 'offline',
-    //     prompt: 'consent',
-    //   });
+  ) {}
 
+  redirectToGoogle() {
     const url = this.google.getAuthUrl();
 
     return { google_auth_url: url };
