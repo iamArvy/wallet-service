@@ -11,9 +11,11 @@ import { CombinedAuthGuard } from './guards/combined.guard';
 import { ApiKeyPermissionsGuard } from './guards/api-key-permission.guard';
 import { AuthController } from './controllers';
 import { AuthService } from './services';
+import { GoogleModule } from 'src/integrations/google/google.module';
 
 @Module({
   imports: [
+    GoogleModule,
     JwtModule.registerAsync({
       imports: [],
       inject: [ConfigService],

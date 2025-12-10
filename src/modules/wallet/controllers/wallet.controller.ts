@@ -23,9 +23,9 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiHeader,
   ApiOkResponse,
   ApiOperation,
+  ApiSecurity,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { WalletService } from '../services';
@@ -48,9 +48,9 @@ export class WalletController {
     type: DepositResponseDto,
   })
   @ApiBearerAuth()
+  @ApiSecurity('api-key')
   @ApiKeyPermissions('deposit')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiHeader({ name: 'x-api-key' })
   @Post('deposit')
   deposit(
     @Req() req: IRequestWithUser<IJwtUser>,
@@ -70,7 +70,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('read')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiHeader({ name: 'x-api-key' })
+  @ApiSecurity('api-key')
   @Get('transactions')
   getPayments() {
     return this.service.getTransactions();
@@ -104,7 +104,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('read')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiHeader({ name: 'x-api-key' })
+  @ApiSecurity('api-key')
   @Get('balance')
   balance(@Req() { user }: IRequestWithUser<IJwtUser>) {
     return this.service.getBalance(user.id);
@@ -113,7 +113,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('transfer')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiHeader({ name: 'x-api-key' })
+  @ApiSecurity('api-key')
   @Post('transfer')
   transfer(
     @Req() { user }: IRequestWithUser<IJwtUser>,

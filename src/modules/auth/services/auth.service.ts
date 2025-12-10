@@ -3,52 +3,57 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import qs from 'qs';
+// import { ConfigService } from '@nestjs/config';
+// import qs from 'qs';
 import { IGoogleUser, IJwtUser } from 'src/common/types';
 import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
 import { TokenService } from './token.service';
 import { PrismaService } from 'src/db/prisma.service';
-import { IGoogleConfig } from 'src/config';
+// import { IGoogleConfig } from 'src/config';
 import { randomInt } from 'crypto';
 import { UserAccount } from '../dto';
+import * as sysMsg from 'src/common/system-messages';
+import { GoogleService } from 'src/integrations/google';
 
 @Injectable()
 export class AuthService {
-  private googleOauthURL = 'https://accounts.google.com/o/oauth2/v2/auth';
+  // private googleOauthURL = 'https://accounts.google.com/o/oauth2/v2/auth';
 
-  private clientId: string;
-  private redirectUri: string;
+  // private clientId: string;
+  // private redirectUri: string;
 
   constructor(
-    config: ConfigService,
+    // config: ConfigService,
     private readonly token: TokenService,
     private readonly prisma: PrismaService,
+    private readonly google: GoogleService,
   ) {
-    const { clientId, redirectUri } =
-      config.getOrThrow<IGoogleConfig>('auth.google');
-    this.clientId = clientId;
-    this.redirectUri = redirectUri;
+    // const { clientId, redirectUri } =
+    //   config.getOrThrow<IGoogleConfig>('auth.google');
+    // this.clientId = clientId;
+    // this.redirectUri = redirectUri;
   }
   redirectToGoogle() {
-    const url =
-      this.googleOauthURL +
-      '?' +
-      qs.stringify({
-        client_id: this.clientId,
-        redirect_uri: this.redirectUri,
-        response_type: 'code',
-        scope: ['openid', 'email', 'profile'].join(' '),
-        access_type: 'offline',
-        prompt: 'consent',
-      });
+    // const url =
+    //   this.googleOauthURL +
+    //   '?' +
+    //   qs.stringify({
+    //     client_id: this.clientId,
+    //     redirect_uri: this.redirectUri,
+    //     response_type: 'code',
+    //     scope: ['openid', 'email', 'profile'].join(' '),
+    //     access_type: 'offline',
+    //     prompt: 'consent',
+    //   });
+
+    const url = this.google.getAuthUrl();
 
     return { google_auth_url: url };
   }
 
   async handleGoogleCallback(gUser: IGoogleUser) {
     if (!gUser) {
-      throw new BadRequestException('Google authentication failed');
+      throw new BadRequestException(sysMsg.GOOGLE_AUTHENTICATION_FAILED);
     }
 
     const user = await this.prisma.user.upsert({
@@ -90,9 +95,8 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException(sysMsg.USER_NOT_FOUND);
 
-    // const { ...user, wallet } = user;
     const wallet = user.wallet
       ? {
           ...user.wallet,

@@ -20,6 +20,14 @@ function createSwaggerConfig(
       scheme: 'bearer',
       bearerFormat: 'JWT',
     })
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key', // Your header name
+        in: 'header',
+      },
+      'api-key', // security name — used in @ApiSecurity
+    )
     .build();
 }
 
