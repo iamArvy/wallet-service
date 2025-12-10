@@ -17,7 +17,12 @@ import {
 
 import * as sysMsg from 'src/common/system-messages';
 import { IPaystackConfig } from 'src/config';
-import { PAYSTACK_BASE_URL, PAYSTACK_CONFIG_NAME } from './paystack.constants';
+import {
+  PAYSTACK_BASE_URL,
+  PAYSTACK_CONFIG_NAME,
+  PAYSTACK_DIGEST_ENCODING,
+  PAYSTACK_WEBHOOK_ALGORITHM,
+} from './paystack.constants';
 
 @Injectable()
 export class PaystackHttpClient {
@@ -25,6 +30,8 @@ export class PaystackHttpClient {
   private readonly logger: Logger;
   private baseUrl = PAYSTACK_BASE_URL;
   private secret: string;
+  private readonly weebhookAlgorithm = PAYSTACK_WEBHOOK_ALGORITHM;
+  private readonly digestEncoding = PAYSTACK_DIGEST_ENCODING;
 
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) baseLogger: Logger,
@@ -100,9 +107,9 @@ export class PaystackHttpClient {
   }
 
   validateWebhookEvent(signature: string, payload: IPaystackWebhookInterface) {
-    const hash = createHmac('sha512', this.secret)
+    const hash = createHmac(this.weebhookAlgorithm, this.secret)
       .update(JSON.stringify(payload))
-      .digest('hex');
+      .digest(this.digestEncoding);
     return (
       hash &&
       signature &&

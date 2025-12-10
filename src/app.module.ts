@@ -25,9 +25,9 @@ import { KeyModule } from './modules/key/key.module';
       },
     }),
     DBModule,
-    WalletModule,
     AuthModule,
     KeyModule,
+    WalletModule,
   ],
   providers: [
     {
