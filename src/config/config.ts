@@ -1,5 +1,5 @@
 import { appConfig, appValidation } from './app.config';
-import { authConfig, authValidation } from './auth.config';
+import { jwtConfig, jwtValidation } from './jwt.config';
 import { dbConfig, dbValidation } from './database.config';
 import { paystackConfig, paystackValidation } from './paystack.config';
 import { loggerConfig, loggerValidation } from './logger.config';
@@ -7,7 +7,7 @@ import { googleConfig, googleValidation } from './google.config';
 
 export const config = [
   appConfig,
-  authConfig,
+  jwtConfig,
   dbConfig,
   loggerConfig,
   paystackConfig,
@@ -15,7 +15,7 @@ export const config = [
 ];
 
 export const validationSchema = appValidation
-  .concat(authValidation)
+  .concat(jwtValidation)
   .concat(dbValidation)
   .concat(loggerValidation)
   .concat(paystackValidation)

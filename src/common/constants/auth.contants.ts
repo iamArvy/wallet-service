@@ -1,1 +1,12 @@
 export const GOOGLE_AUTH_STRATEGY = 'google';
+export const API_KEY_PERMISSIONS_METADATA = 'apiKeyPermissions';
+export const API_KEY_HEADER = 'x-api-key';
+export const API_KEY_SECURITY_NAME = 'api-key';
+export const JWT_KEY_HEADER = 'authorization';
+export const JWT_KEY_HEADER_PREFIX = 'Bearer ';
+export const JWT_AUTH_STRATEGY = 'jwt';
+export const JWT_CONFIG_NAME = 'jwt';
+export const ACCESS_TOKEN_EXPIRY = 2 * 60 * 60;
+export const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60;
+export const ACCESS_TOKEN_TYPE = 'access';
+export const REFRESH_TOKEN_TYPE = 'refresh';

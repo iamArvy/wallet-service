@@ -1,36 +1,23 @@
 import { Module } from '@nestjs/common';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { GoogleStrategy } from './strategies';
-import { TokenService } from './services/token.service';
-import { IJwtConfig } from 'src/config';
-import { JWTAuthGuard } from './guards';
-import { ApiKeyGuard } from './guards/api-key.guard';
-import { CombinedAuthGuard } from './guards/combined.guard';
-import { ApiKeyPermissionsGuard } from './guards/api-key-permission.guard';
+import { GoogleStrategy, JwtStrategy } from './strategies';
 import { AuthController } from './controllers';
 import { AuthService } from './services';
 import { GoogleModule } from 'src/integrations/google/google.module';
+import { TokenModule } from 'src/integrations/token/token.module';
+import {
+  ApiKeyGuard,
+  ApiKeyPermissionsGuard,
+  CombinedAuthGuard,
+  JWTAuthGuard,
+} from './guards';
 
 @Module({
-  imports: [
-    GoogleModule,
-    JwtModule.registerAsync({
-      imports: [],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const jwt = config.getOrThrow<IJwtConfig>('auth.jwt');
-        return jwt;
-      },
-    }),
-  ],
+  imports: [GoogleModule, TokenModule],
   controllers: [AuthController],
   providers: [
     AuthService,
     GoogleStrategy,
     JwtStrategy,
-    TokenService,
     JWTAuthGuard,
     ApiKeyGuard,
     CombinedAuthGuard,

@@ -8,6 +8,12 @@ import { JWTAuthGuard } from './jwt-auth.guard';
 import { ApiKeyGuard } from './api-key.guard';
 import { lastValueFrom, Observable } from 'rxjs';
 import { Request } from 'express';
+import {
+  API_KEY_HEADER,
+  JWT_KEY_HEADER,
+  JWT_KEY_HEADER_PREFIX,
+} from 'src/common/constants';
+import { NO_AUTHENTICATION_PROVIDED } from 'src/common/system-messages';
 
 @Injectable()
 export class CombinedAuthGuard implements CanActivate {
@@ -18,10 +24,10 @@ export class CombinedAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest<Request>();
-    const authHeader = request.headers['authorization'];
-    const apiKeyHeader = request.headers['x-api-key'];
+    const authHeader = request.headers[JWT_KEY_HEADER];
+    const apiKeyHeader = request.headers[API_KEY_HEADER];
 
-    if (authHeader?.startsWith('Bearer ')) {
+    if (authHeader?.startsWith(JWT_KEY_HEADER_PREFIX)) {
       const result = this.jwtAuthGuard.canActivate(context);
       return this.resolveGuardResult(result);
     }
@@ -30,7 +36,7 @@ export class CombinedAuthGuard implements CanActivate {
       return await this.apiKeyGuard.canActivate(context);
     }
 
-    throw new UnauthorizedException('No authentication provided');
+    throw new UnauthorizedException(NO_AUTHENTICATION_PROVIDED);
   }
 
   private async resolveGuardResult(
@@ -44,7 +50,6 @@ export class CombinedAuthGuard implements CanActivate {
       return await result;
     }
 
-    // It's an Observable → convert to Promise
     return await lastValueFrom(result);
   }
 }

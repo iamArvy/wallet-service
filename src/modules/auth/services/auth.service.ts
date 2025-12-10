@@ -3,13 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
-// import qs from 'qs';
 import { IGoogleUser, IJwtUser } from 'src/common/types';
 import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
-import { TokenService } from './token.service';
+import { TokenService } from 'src/integrations/token';
 import { PrismaService } from 'src/db/prisma.service';
-// import { IGoogleConfig } from 'src/config';
 import { randomInt } from 'crypto';
 import { UserAccount } from '../dto';
 import * as sysMsg from 'src/common/system-messages';

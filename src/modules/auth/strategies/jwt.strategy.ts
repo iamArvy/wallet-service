@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigService } from '@nestjs/config';
 import { IJwtConfig } from 'src/config';
+import { JWT_CONFIG_NAME } from 'src/common/constants';
 
 interface IJwtPayload {
   sub: string;
@@ -13,7 +14,7 @@ interface IJwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(config: ConfigService) {
-    const { secret } = config.getOrThrow<IJwtConfig>('auth.jwt');
+    const { secret } = config.getOrThrow<IJwtConfig>(JWT_CONFIG_NAME);
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,

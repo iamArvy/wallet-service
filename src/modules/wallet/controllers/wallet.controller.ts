@@ -35,6 +35,7 @@ import {
   ApiKeyPermissionsGuard,
 } from 'src/modules/auth/guards/api-key-permission.guard';
 import { type IPaystackWebhookInterface } from 'src/integrations/paystack';
+import { API_KEY_SECURITY_NAME } from 'src/common/constants';
 
 @Controller('wallet')
 export class WalletController {
@@ -48,7 +49,7 @@ export class WalletController {
     type: DepositResponseDto,
   })
   @ApiBearerAuth()
-  @ApiSecurity('api-key')
+  @ApiSecurity(API_KEY_SECURITY_NAME)
   @ApiKeyPermissions('deposit')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
   @Post('deposit')
@@ -70,7 +71,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('read')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiSecurity('api-key')
+  @ApiSecurity(API_KEY_SECURITY_NAME)
   @Get('transactions')
   getPayments() {
     return this.service.getTransactions();
@@ -104,7 +105,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('read')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiSecurity('api-key')
+  @ApiSecurity(API_KEY_SECURITY_NAME)
   @Get('balance')
   balance(@Req() { user }: IRequestWithUser<IJwtUser>) {
     return this.service.getBalance(user.id);
@@ -113,7 +114,7 @@ export class WalletController {
   @ApiBearerAuth()
   @ApiKeyPermissions('transfer')
   @UseGuards(CombinedAuthGuard, ApiKeyPermissionsGuard)
-  @ApiSecurity('api-key')
+  @ApiSecurity(API_KEY_SECURITY_NAME)
   @Post('transfer')
   transfer(
     @Req() { user }: IRequestWithUser<IJwtUser>,

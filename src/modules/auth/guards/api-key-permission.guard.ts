@@ -5,18 +5,19 @@ import {
   ForbiddenException,
   SetMetadata,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { IRequestWithUser } from 'src/common/types';
+import * as sysMsg from 'src/common/system-messages';
+import { API_KEY_PERMISSIONS_METADATA } from 'src/common/constants';
 
 export const ApiKeyPermissions = (...permissions: string[]) =>
-  SetMetadata('apiKeyPermissions', permissions);
+  SetMetadata(API_KEY_PERMISSIONS_METADATA, permissions);
 
 @Injectable()
 export class ApiKeyPermissionsGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const requiredPermissions: string[] =
       (Reflect.getMetadata(
-        'apiKeyPermissions',
+        API_KEY_PERMISSIONS_METADATA,
         context.getHandler(),
       ) as string[]) || [];
 
@@ -29,7 +30,7 @@ export class ApiKeyPermissionsGuard implements CanActivate {
     const missing = requiredPermissions.some((p: string) => !perms.includes(p));
 
     if (missing) {
-      throw new ForbiddenException('API key missing permission');
+      throw new ForbiddenException(sysMsg.MISSING_PERMISSIONS);
     }
 
     return true;

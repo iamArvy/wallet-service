@@ -5,6 +5,7 @@ import { LoggerService, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ConfigService } from '@nestjs/config';
+import { API_KEY_HEADER, API_KEY_SECURITY_NAME } from './common/constants';
 
 function createSwaggerConfig(
   name: string,
@@ -23,10 +24,10 @@ function createSwaggerConfig(
     .addApiKey(
       {
         type: 'apiKey',
-        name: 'x-api-key', // Your header name
+        name: API_KEY_HEADER,
         in: 'header',
       },
-      'api-key', // security name — used in @ApiSecurity
+      API_KEY_SECURITY_NAME,
     )
     .build();
 }
