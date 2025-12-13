@@ -206,7 +206,7 @@ No payload. Requires `Authorization: Bearer <JWT_TOKEN>` header.
   {
     "id": "clx45z99p0001k010x82r0f7a",
     "name": "reporting-key",
-    "api_key": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "api_key": "sk_live_xxx",
     "permissions": ["read"],
     "expires_at": "2024-07-20T10:00:00.000Z",
     "revoked": true,
